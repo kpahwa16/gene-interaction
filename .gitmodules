@@ -4,3 +4,6 @@
 [submodule "gene-interact/gene-interact/scGPT"]
 	path = gene-interact/gene-interact/scGPT
 	url = https://github.com/bowang-lab/scGPT
+[submodule "scGPT"]
+	path = scGPT
+	url = https://github.com/bowang-lab/scGPT
