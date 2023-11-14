@@ -1,0 +1,3 @@
+[submodule "gene-interact/gene-interact/GenePT"]
+	path = gene-interact/gene-interact/GenePT
+	url = https://github.com/yiqunchen/GenePT
