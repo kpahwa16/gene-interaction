@@ -7,3 +7,6 @@
 [submodule "scGPT"]
 	path = scGPT
 	url = https://github.com/bowang-lab/scGPT
+[submodule "GenePT"]
+	path = GenePT
+	url = https://github.com/yiqunchen/GenePT
