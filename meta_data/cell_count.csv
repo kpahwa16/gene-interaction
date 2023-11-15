@@ -1,0 +1,97 @@
+Overall AD neuropathological Change,Subclass,counts
+High,Lamp5 Lhx6,9019
+Not AD,Lamp5 Lhx6,2184
+Low,Lamp5 Lhx6,2423
+Intermediate,Lamp5 Lhx6,5670
+Intermediate,Lamp5,10855
+High,Lamp5,18453
+Low,Lamp5,5540
+Not AD,Lamp5,4717
+High,Pax6,3786
+Not AD,Pax6,1058
+Low,Pax6,1284
+Intermediate,Pax6,2416
+High,Sncg,8104
+Intermediate,Sncg,6163
+Low,Sncg,3551
+Not AD,Sncg,2673
+Not AD,Vip,12147
+High,Vip,39579
+Intermediate,Vip,28232
+Low,Vip,15309
+Not AD,Sst Chodl,188
+High,Sst Chodl,511
+Intermediate,Sst Chodl,468
+Low,Sst Chodl,170
+Intermediate,Sst,13904
+Low,Sst,7054
+High,Sst,17860
+Not AD,Sst,7054
+Low,Pvalb,11897
+High,Pvalb,33203
+Not AD,Pvalb,10578
+Intermediate,Pvalb,24298
+Not AD,Chandelier,1259
+Low,Chandelier,1564
+Intermediate,Chandelier,3059
+High,Chandelier,4362
+Low,L2/3 IT,46931
+Not AD,L2/3 IT,43897
+Intermediate,L2/3 IT,88724
+High,L2/3 IT,121821
+Intermediate,L6 IT,11723
+High,L6 IT,18056
+Not AD,L6 IT,4288
+Low,L6 IT,5219
+High,L4 IT,71871
+Not AD,L4 IT,16534
+Low,L4 IT,20113
+Intermediate,L4 IT,43534
+Low,L5 IT,15212
+Not AD,L5 IT,13706
+High,L5 IT,48066
+Intermediate,L5 IT,31526
+Intermediate,L5 ET,645
+High,L5 ET,977
+Not AD,L5 ET,303
+Low,L5 ET,294
+Not AD,L6 CT,1645
+Low,L6 CT,2103
+High,L6 CT,7389
+Intermediate,L6 CT,4582
+Low,L6b,1675
+High,L6b,6782
+Intermediate,L6b,3523
+Not AD,L6b,1265
+High,L6 IT Car3,10059
+Intermediate,L6 IT Car3,6104
+Low,L6 IT Car3,2825
+Not AD,L6 IT Car3,2651
+Not AD,L5/6 NP,2065
+High,L5/6 NP,7789
+Low,L5/6 NP,2547
+Intermediate,L5/6 NP,5245
+High,Astrocyte,34066
+Intermediate,Astrocyte,16371
+Low,Astrocyte,9525
+Not AD,Astrocyte,7457
+High,OPC,12627
+Low,OPC,4424
+Not AD,OPC,4535
+Intermediate,OPC,8852
+Low,Oligodendrocyte,14264
+Intermediate,Oligodendrocyte,31373
+Not AD,Oligodendrocyte,13419
+High,Oligodendrocyte,46625
+High,Endothelial,994
+Intermediate,Endothelial,446
+Not AD,Endothelial,272
+Low,Endothelial,268
+High,VLMC,2475
+Intermediate,VLMC,878
+Low,VLMC,542
+Not AD,VLMC,309
+High,Microglia-PVM,18778
+Low,Microglia-PVM,6428
+Intermediate,Microglia-PVM,9665
+Not AD,Microglia-PVM,4034
