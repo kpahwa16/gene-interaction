@@ -29,4 +29,4 @@ def train_model(train_loader, test_loader, num_genes, learning_rate=0.001, epoch
 
     # Evaluate the model
     model_save_path = './mlp_model.pth'
-    torch.save(mlp.state_dict(), model_save_path)
+    torch.save(model.state_dict(), model_save_path)
