@@ -38,3 +38,39 @@ def create_data_loaders(gex, labels, batch_size=64, train_split=0.8):
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
     return train_loader, test_loader
+
+if __name__ == "__main__":
+    path_data = '/data/kpahwa/gene-interact/RNAseq/'
+    
+    # Loading the data
+    data_cell_type_9 = sc.read_h5ad(os.path.join(path_data, "out", "gene_expression", 'cell_type_9.h5ad'))
+    # data_cell_type_11 = sc.read_h5ad(os.path.join(path_data, "out", "gene_expression", 'cell_type_11.h5ad'))
+    
+    # Printing basic information
+    print(data_cell_type_9)
+    
+    # Inspecting the .obs attribute
+    print("\nObservations (obs) metadata:")
+    print(data_cell_type_9.obs.head())
+    
+    # Inspecting the .var attribute
+    print("\nVariables (var) metadata:")
+    print(data_cell_type_9.var.head())
+    
+    # Summary of the data
+    print(f'\nDataset shape: {data_cell_type_9.shape}')
+    
+    # Checking Missing Values
+    print(f'\nNumber of missing values: {np.isnan(data_cell_type_9.X).sum()}')
+    
+    # Exploring Unique Values in Categorical Metadata
+    print("\nUnique values in 'Overall AD neuropathological Change':")
+    print(data_cell_type_9.obs['Overall AD neuropathological Change'].value_counts())
+    
+    print("\nUnique values in 'Subclass':")
+    print(data_cell_type_9.obs['Subclass'].value_counts())
+    
+    labels = (data_cell_type_9.obs["Overall AD neuropathological Change"].tolist())
+    gex = data_cell_type_9.X
+    create_data_loaders(gex, labels, batch_size=64, train_split=0.8)
+    
