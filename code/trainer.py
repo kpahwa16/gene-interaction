@@ -1,6 +1,7 @@
 def train_model(train_loader, test_loader, num_genes, learning_rate=0.001, epochs=10):
     # Check for CUDA availability
-    device = "cpu"
+    use_gpu = True
+    device = torch.device("cuda:1" if torch.cuda.is_available() and use_gpu else "cpu")
     print(f"Using device: {device}")
 
     # Instantiate the model
