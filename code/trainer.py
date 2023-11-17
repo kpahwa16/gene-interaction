@@ -27,6 +27,6 @@ def train_model(train_loader, test_loader, num_genes, learning_rate=0.001, epoch
 
             print(f"Epoch [{epoch+1}/{epochs}], Loss: {loss.item():.4f}")
 
-    # Evaluate the model
+    # Saving the model
     model_save_path = './mlp_model.pth'
     torch.save(model.state_dict(), model_save_path)
