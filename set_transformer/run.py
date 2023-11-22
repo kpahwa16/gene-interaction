@@ -20,32 +20,45 @@ parser.add_argument('--learning_rate', type=float, default=0.001)
 parser.add_argument('--model_save_path', type=str, default='./set_transformer_model.pth')
 args = parser.parse_args()
 
-# Load data
-adata = sc.read_h5ad(args.h5ad_file)
-
-# Extract gene expression matrix and labels
-X = adata.X
-y = LabelEncoder().fit_transform(adata.obs['Overall AD neuropathological Change'])
-
-# Train-test split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
+# Dataset class for GeneExpression
 class GeneExpressionDataset(Dataset):
-    def __init__(self, expressions, labels):
-        self.expressions = expressions
+    def __init__(self, expressions, labels, num_genes):
+        self.expressions = expressions  # Sparse matrix
         self.labels = labels
+        self.num_genes = num_genes
+        self.embedding = nn.Embedding(num_genes, embedding_dim)  # Define embedding layer
 
     def __len__(self):
         return len(self.labels)
 
     def __getitem__(self, idx):
-        return torch.tensor(self.expressions[idx].toarray(), dtype=torch.float), self.labels[idx]
+        # Converting sparse matrix row to dense tensor
+        x = self.expressions[idx].toarray().squeeze(0)
+        # Create indices tensor for non-zero entries
+        non_zero_indices = torch.nonzero(x, as_tuple=True)[0]
+        # Fetching embeddings for non-zero indices and scaling them by their expression level
+        gene_embeddings = self.embedding(non_zero_indices)
+        scaled_embeddings = gene_embeddings * x[non_zero_indices].unsqueeze(1)
+
+        return scaled_embeddings, self.labels[idx]
+
+# Fetching gene expression levels and labels
+adata = sc.read_h5ad('path_to_your_h5ad_file')
+X = adata.X  # Sparse Matrix
+y = LabelEncoder().fit_transform(adata.obs['Overall AD neuropathological Change'])
+
+# Train-test split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Hyperparameters
+embedding_dim = 128  # Example embedding size, adjust as needed
+num_genes = X.shape[1]
 
 # Datasets and Dataloaders
-train_dataset = GeneExpressionDataset(X_train, y_train)
-test_dataset = GeneExpressionDataset(X_test, y_test)
-train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
-test_loader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False)
+train_dataset = GeneExpressionDataset(X_train, y_train, num_genes)
+test_dataset = GeneExpressionDataset(X_test, y_test, num_genes)
+train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
+test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
 
 # Model
 class GeneInteractionModel(nn.Module):
