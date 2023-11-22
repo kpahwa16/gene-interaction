@@ -17,10 +17,10 @@ class ModifiedSetTransformer(nn.Module):
             nn.Linear(dim_hidden, dim_output))
         self.attention_weights = []
 
-    def forward(self, X):
+    def forward(self, X, mask=None):
         self.attention_weights = []
-        enc_out = self.enc(X)
-        # check if changes required
-        dec_out, attn_weight = self.dec(enc_out, return_attention=True)
+        # Passing the mask through the encoder and decoder
+        enc_out = self.enc(X, mask)
+        dec_out, attn_weight = self.dec(enc_out, mask, return_attention=True)
         self.attention_weights.append(attn_weight)
         return dec_out
