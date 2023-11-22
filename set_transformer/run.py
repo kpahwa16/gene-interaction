@@ -23,25 +23,37 @@ args = parser.parse_args()
 
 # Dataset class for GeneExpression
 class GeneExpressionDataset(Dataset):
-    def __init__(self, expressions, labels, num_genes):
-        self.expressions = expressions  # Sparse matrix
+    def __init__(self, expressions, labels, num_genes, max_length=None):
+        self.expressions = expressions
         self.labels = labels
         self.num_genes = num_genes
-        self.embedding = nn.Embedding(num_genes, embedding_dim)  # Define embedding layer
+        self.embedding = nn.Embedding(num_genes, embedding_dim)
+        self.max_length = max_length if max_length else self._find_max_length()
+
+    def _find_max_length(self):
+        max_len = 0
+        for i in range(self.expressions.shape[0]):
+            max_len = max(max_len, self.expressions[i].nnz)
+        return max_len
 
     def __len__(self):
         return len(self.labels)
 
     def __getitem__(self, idx):
-        # Converting sparse matrix row to dense tensor
         x = self.expressions[idx].toarray().squeeze(0)
-        # Create indices tensor for non-zero entries
         non_zero_indices = torch.nonzero(x, as_tuple=True)[0]
-        # Fetching embeddings for non-zero indices and scaling them by their expression level
         gene_embeddings = self.embedding(non_zero_indices)
         scaled_embeddings = gene_embeddings * x[non_zero_indices].unsqueeze(1)
 
-        return scaled_embeddings, self.labels[idx]
+        # Padding
+        padded_embeddings = pad_sequence([scaled_embeddings], batch_first=True, padding_value=0)
+        padded_embeddings = padded_embeddings.squeeze(0)
+
+        # Mask
+        mask = torch.zeros(self.max_length, dtype=torch.bool)
+        mask[:scaled_embeddings.size(0)] = 1
+
+        return padded_embeddings, mask, self.labels[idx]
 
 # Fetching gene expression levels and labels
 adata = sc.read_h5ad('path_to_your_h5ad_file')
