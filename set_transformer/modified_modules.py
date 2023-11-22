@@ -16,7 +16,7 @@ class MAB(nn.Module):
             self.ln1 = nn.LayerNorm(dim_V)
         self.fc_o = nn.Linear(dim_V, dim_V)
 
-    def forward(self, Q, K, return_attention=False):
+    def forward(self, Q, K, mask=None, return_attention=False):
         Q = self.fc_q(Q)
         K, V = self.fc_k(K), self.fc_v(K)
 
@@ -24,7 +24,14 @@ class MAB(nn.Module):
         Q_ = torch.cat(Q.split(dim_split, 2), 0)
         K_ = torch.cat(K.split(dim_split, 2), 0)
         V_ = torch.cat(V.split(dim_split, 2), 0)
-        A = torch.softmax(Q_.bmm(K_.transpose(1,2))/math.sqrt(self.dim_V), 2)
+
+        attention_scores = Q_.bmm(K_.transpose(1, 2)) / math.sqrt(self.dim_V)
+        
+        if mask is not None:
+            mask = mask.unsqueeze(1).expand_as(attention_scores)
+            attention_scores = attention_scores.masked_fill(mask == 0, -1e9)  # Use a large negative number for masked positions
+
+        A = torch.softmax(attention_scores, 2)
         O = torch.cat((Q_ + A.bmm(V_)).split(Q.size(0), 0), 2)
         O = O if getattr(self, 'ln0', None) is None else self.ln0(O)
         O = O + F.relu(self.fc_o(O))
@@ -34,15 +41,16 @@ class MAB(nn.Module):
             return O, A.view(Q.size(0), self.num_heads, Q.size(1), K.size(1))
         return O
     
+    
 class SAB(nn.Module):
     def __init__(self, dim_in, dim_out, num_heads, ln=False):
         super(SAB, self).__init__()
         self.mab = MAB(dim_in, dim_in, dim_out, num_heads, ln=ln)
 
-    def forward(self, X, return_attention=False):
+    def forward(self, X, mask=None, return_attention=False):
         if return_attention:
-            return self.mab(X, X, return_attention=True)
-        return self.mab(X, X)
+            return self.mab(X, X, mask, return_attention=True)
+        return self.mab(X, X, mask)
     
 class ISAB(nn.Module):
     def __init__(self, dim_in, dim_out, num_heads, num_inds, ln=False):
@@ -52,11 +60,11 @@ class ISAB(nn.Module):
         self.mab0 = MAB(dim_out, dim_in, dim_out, num_heads, ln=ln)
         self.mab1 = MAB(dim_in, dim_out, dim_out, num_heads, ln=ln)
 
-    def forward(self, X, return_attention=False):
-        H = self.mab0(self.I.repeat(X.size(0), 1, 1), X)
+    def forward(self, X, mask=None, return_attention=False):
+        H = self.mab0(self.I.repeat(X.size(0), 1, 1), X, mask)
         if return_attention:
-            return self.mab1(X, H, return_attention=True)
-        return self.mab1(X, H)
+            return self.mab1(X, H, mask, return_attention=True)
+        return self.mab1(X, H, mask)
 
     
 class PMA(nn.Module):
@@ -66,9 +74,8 @@ class PMA(nn.Module):
         nn.init.xavier_uniform_(self.S)
         self.mab = MAB(dim, dim, dim, num_heads, ln=ln)
 
-    def forward(self, X, return_attention=False):
+    def forward(self, X, mask=None, return_attention=False):
         if return_attention:
-            return self.mab(self.S.repeat(X.size(0), 1, 1), X, return_attention=True)
-        return self.mab(self.S.repeat(X.size(0), 1, 1), X)
-
+            return self.mab(self.S.repeat(X.size(0), 1, 1), X, mask, return_attention=True)
+        return self.mab(self.S.repeat(X.size(0), 1, 1), X, mask)
 
