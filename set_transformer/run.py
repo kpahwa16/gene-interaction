@@ -76,7 +76,8 @@ test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
 class GeneInteractionModel(nn.Module):
     def __init__(self, num_genes, num_classes):
         super(GeneInteractionModel, self).__init__()
-        self.set_transformer = ModifiedSetTransformer(dim_input=num_genes, num_outputs=num_classes, dim_output=num_classes)
+        self.set_transformer = ModifiedSetTransformer(dim_input=128, num_outputs=num_classes, dim_output=num_classes)
+#         self.set_transformer = ModifiedSetTransformer(dim_input=num_genes, num_outputs=num_classes, dim_output=num_classes)
         self.fc = nn.Linear(num_classes, num_classes)
 
     def forward(self, x, mask):
@@ -84,6 +85,7 @@ class GeneInteractionModel(nn.Module):
         x = torch.mean(x, dim=1)
         return self.fc(x)
 
+model = GeneInteractionModel(num_genes=X_train_sparse.shape[1], num_classes=len(np.unique(y))).cuda()
 model = GeneInteractionModel(num_genes=X.shape[1], num_classes=len(np.unique(y))).cuda()
 # Training
 optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
