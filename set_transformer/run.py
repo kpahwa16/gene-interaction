@@ -7,6 +7,7 @@ import argparse
 from models import SetTransformer
 from sklearn.preprocessing import LabelEncoder
 from torch.utils.data import Dataset, DataLoader
+from torch.nn.utils.rnn import pad_sequence
 from sklearn.model_selection import train_test_split
 from modified_models import *
 from modified_modules import *
@@ -67,8 +68,8 @@ class GeneInteractionModel(nn.Module):
         self.set_transformer = ModifiedSetTransformer(dim_input=num_genes, num_outputs=num_classes, dim_output=num_classes)
         self.fc = nn.Linear(num_classes, num_classes)
 
-    def forward(self, x):
-        x = self.set_transformer(x)
+    def forward(self, x, mask):
+        x = self.set_transformer(x, mask)
         x = torch.mean(x, dim=1)
         return self.fc(x)
 
@@ -79,10 +80,10 @@ criterion = nn.CrossEntropyLoss()
 
 for epoch in range(args.epochs):
     model.train()
-    for data, labels in train_loader:
-        data, labels = data.cuda(), labels.cuda()
+    for data, mask, labels in train_loader:
+        data, mask, labels = data.cuda(), mask.cuda(), labels.cuda()
         optimizer.zero_grad()
-        outputs = model(data)
+        outputs = model(data, mask)
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
@@ -110,9 +111,9 @@ print('Test Accuracy: {} %'.format(100 * correct / total))
 
 all_attention_weights = []
 with torch.no_grad():
-    for data, _ in test_loader:
-        data = data.cuda()
-        _ = model(data)
+    for data, mask, _ in test_loader:
+        data, mask = data.cuda(), mask.cuda()
+        _ = model(data, mask)
         all_attention_weights.append(model.attention_weights)
 
 aggregate_attention = torch.mean(torch.stack(all_attention_weights), dim=[0, 1])
