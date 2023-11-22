@@ -4,7 +4,6 @@ import numpy as np
 import scanpy as sc
 import os
 import argparse
-from models import SetTransformer
 from sklearn.preprocessing import LabelEncoder
 from torch.utils.data import Dataset, DataLoader
 from torch.nn.utils.rnn import pad_sequence
